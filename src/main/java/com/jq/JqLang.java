@@ -8,6 +8,7 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.source.Source;
+import com.oracle.truffle.polyglot.PolyglotImpl;
 import org.antlr.v4.runtime.*;
 
 import java.io.IOException;
@@ -16,14 +17,14 @@ import java.io.IOException;
  * run code with ANTLR and Truffle.
  */
 @TruffleLanguage.Registration(
-        id = "jqlang",
+        id = "jq",
         name = "jq Language",
         version = "0.0.2")
 public class JqLang extends TruffleLanguage<JqContext> {
 
     @Override
     protected JqContext createContext(Env env) {
-        return new JqContext();
+        return new JqContext(env);
     }
 
     @Override
@@ -50,4 +51,9 @@ public class JqLang extends TruffleLanguage<JqContext> {
 
         return new JqRootNode(jqNode);
     }
+
+    public static JqContext getContext() {
+        return TruffleLanguage.getCurrentContext(JqLang.class);
+    }
+
 }

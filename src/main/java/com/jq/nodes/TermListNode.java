@@ -1,9 +1,19 @@
 package com.jq.nodes;
 
+import com.jq.JqContext;
+import com.jq.JqLang;
+import com.oracle.truffle.api.TruffleContext;
 import com.oracle.truffle.api.TruffleException;
+import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import org.graalvm.polyglot.Value;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +26,18 @@ public final class TermListNode extends JqNode {
 
     @Override
     public Object executeObject(VirtualFrame frame) {
-        Object myObject = Map.<String, Object>of("foo", Map.of("bar", 1));
+        Object myObject = new Object();
+
+        InputStream inputStream = JqLang.getContext().getEnv().in();
+        try {
+            byte[] bytes = inputStream.readAllBytes();
+
+            myObject = convertFromBytes(bytes);
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         for (TermNode term : terms) {
             if (myObject instanceof Map) {
                 myObject = ((Map) myObject).get(term.executeObject(frame));
@@ -31,5 +52,12 @@ public final class TermListNode extends JqNode {
         }
 
         return myObject;
+    }
+
+    private Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+             ObjectInputStream in = new ObjectInputStream(bis)) {
+            return in.readObject();
+        }
     }
 }
