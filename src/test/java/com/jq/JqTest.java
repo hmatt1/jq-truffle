@@ -1,18 +1,12 @@
 package com.jq;
 
-import com.jq.nodes.JqNode;
-import com.jq.nodes.JqRootNode;
-import com.jq.nodes.TermListNode;
-import com.jq.nodes.TermNode;
-import com.oracle.truffle.api.CallTarget;
-import com.oracle.truffle.api.Truffle;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JqTest {
@@ -20,14 +14,10 @@ class JqTest {
     @Test
     @DisplayName("Test .foo.bar")
     public void myTest() {
-        JqNode exprNode = new TermListNode(List.of(new TermNode("foo"), new TermNode("bar")));
-        var rootNode = new JqRootNode(exprNode);
+        Map<String, Object> input = Map.of("foo", Map.of("bar", 1));
+        int result = JQ.jq(input, ".foo.bar", Integer.class);
 
-        CallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
-
-        var result = callTarget.call();
-
-        assertEquals(1, result);
+        assertThat(result).isEqualTo(1);
     }
 }
 
