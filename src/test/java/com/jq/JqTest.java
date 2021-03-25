@@ -17,7 +17,6 @@ class JqTest {
     public void myTest() {
         System.out.println(ManagementFactory.getRuntimeMXBean().getVmVersion());
 
-
         Map<String, Object> input = Map.of("foo", Map.of("bar", 1));
         int result = JQ.jq(input, ".foo.bar", Integer.class);
 
