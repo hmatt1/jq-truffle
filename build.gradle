@@ -18,9 +18,9 @@ repositories {
 }
 
 dependencies {
-    implementation "org.graalvm.truffle:truffle-api:21.0.0.2"
     annotationProcessor "org.graalvm.truffle:truffle-dsl-processor:21.0.0.2"
     implementation "com.jq:jq-grammar:1.0"
+    implementation "org.graalvm.truffle:truffle-api:21.0.0.2"
 
     testImplementation 'org.assertj:assertj-core:3.19.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
@@ -36,11 +36,23 @@ test {
             '--add-exports',
             'org.graalvm.truffle/com.oracle.truffle.api.dsl=ALL-UNNAMED',
             '--add-exports',
-            'org.graalvm.truffle/com.oracle.truffle.api.source=ALL-UNNAMED'
+            'org.graalvm.truffle/com.oracle.truffle.api.source=ALL-UNNAMED',
+            '--add-exports',
+            'org.graalvm.truffle/com.oracle.truffle.api.exception=ALL-UNNAMED',
+            '-Dgraalvm.locatorDisabled=true'
+
     useJUnitPlatform()
     testLogging {
         showStandardStreams true
         events "passed", "skipped", "failed"
         exceptionFormat "full"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
     }
 }
