@@ -1,5 +1,6 @@
 package com.jq.nodes;
 
+import com.jq.JqContext;
 import com.jq.JqLang;
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -41,7 +42,8 @@ public final class JqRootNode extends RootNode {
             };
         }
 
-        return this.exprNode.executeObject(frame);
+
+        return JqLang.getContext().getEnv().asGuestValue(this.exprNode.executeObject(frame));
     }
 
     private Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {

@@ -3,6 +3,7 @@ package com.jq;
 
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Value;
 
 import java.io.*;
 
@@ -12,7 +13,8 @@ public class JQ {
     public static Object jq(Object input, String expression) {
         InputStream inputStream = new ByteArrayInputStream(convertToBytes(input));
         try (Context context = Context.newBuilder("jq").in(inputStream).build()) {
-            return context.eval("jq", expression);
+            Object value = context.eval("jq", expression).asHostObject();
+            return value;
         }
     }
 
