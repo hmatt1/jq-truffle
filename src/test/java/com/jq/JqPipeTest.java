@@ -34,5 +34,13 @@ class JqPipeTest {
         assertThat(result.get("baz")).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("Test .foo | .bar | .baz")
+    public void myTest3() {
+        Map<String, Object> input = Map.of("foo", Map.of("bar", Map.of("baz", 1)));
+        Integer result = JQ.jq(input, ".foo | .bar | .baz", Integer.class);
+
+        assertThat(result).isEqualTo(1);
+    }
 }
 

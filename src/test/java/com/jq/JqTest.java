@@ -71,5 +71,14 @@ class JqTest {
         assertThat(((List<MyCoolObject>) result).get(1).getCode()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("Test .")
+    public void myTest6() {
+        Map<String, Object> input = Map.of("foo", 1);
+        Object result = JQ.jq(input, ".");
+
+        assertThat(result).isInstanceOf(Map.class);
+        assertThat(((Map) result).get("foo")).isEqualTo(1);
+    }
 }
 
