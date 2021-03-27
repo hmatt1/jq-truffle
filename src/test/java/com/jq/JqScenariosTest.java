@@ -43,7 +43,10 @@ class JqScenariosTest {
                 new JqTestScenario(".foo | .bar", fooBarBaz, Map.of("baz", 1), Map.class),
                 new JqTestScenario(".foo | .bar | .baz", fooBarBaz, 1, Integer.class),
                 new JqTestScenario("{\"foo\": 1}", null, Map.of("foo", new BigDecimal(1)), Map.class),
-                new JqTestScenario("{\"foo\": {\"bar\": 1 } }", null, Map.of("foo", Map.of("bar", new BigDecimal(1))), Map.class)
+                new JqTestScenario("{\"foo\": {\"bar\": 1 } }", null, Map.of("foo", Map.of("bar", new BigDecimal(1))), Map.class),
+                new JqTestScenario("{\"foo\": {\"bar\": 1 } } | .foo", null, Map.of("bar", new BigDecimal(1)), Map.class),
+                new JqTestScenario("{\"foo\": {\"bar\": 1 } } | { \"biz\": .foo.bar }", null, Map.of("biz", new BigDecimal(1)), Map.class),
+                new JqTestScenario("{ \"biz\": .foo.bar }", fooBar, Map.of("biz", 1), Map.class)
         );
     }
 
