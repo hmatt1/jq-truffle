@@ -13,8 +13,28 @@ public class JQ {
     public static Object jq(Object input, String expression) {
         InputStream inputStream = new ByteArrayInputStream(convertToBytes(input));
         try (Context context = Context.newBuilder("jq").in(inputStream).build()) {
-            Object value = context.eval("jq", expression).asHostObject();
-            return value;
+            Value value = context.eval("jq", expression);
+
+            Object result;
+            if (value.isHostObject()) {
+                result = value.asHostObject();
+            } else if (value.fitsInInt()) {
+                result = value.asInt();
+            } else if (value.fitsInLong()) {
+                result = value.asLong();
+            } else if (value.fitsInDouble()) {
+                result = value.asDouble();
+            } else if (value.fitsInFloat()) {
+                result = value.asFloat();
+            } else {
+                throw new AbstractTruffleException() {
+                    @Override
+                    public String getMessage() {
+                        return "Unknown return type for " + value.toString();
+                    }
+                };
+            }
+            return result;
         }
     }
 
