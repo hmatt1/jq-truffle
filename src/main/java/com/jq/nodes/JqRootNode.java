@@ -42,11 +42,10 @@ public final class JqRootNode extends RootNode {
             };
         }
 
-
         return JqLang.getContext().getEnv().asGuestValue(this.exprNode.executeObject(frame));
     }
 
-    private Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
+    private static Object convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
         try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
              ObjectInputStream in = new ObjectInputStream(bis)) {
             return in.readObject();

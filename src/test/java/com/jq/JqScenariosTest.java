@@ -32,52 +32,54 @@ class JqScenariosTest {
 
 
         return Stream.of(
-//                new JqTestScenario(".", fooBar, fooBar, Map.class),
-//                new JqTestScenario(".foo.bar", fooBar, 1, Integer.class),
-//                new JqTestScenario(".foo.bar", fooBarDouble, 2.5, Double.class),
-                new JqTestScenario(".foo.bar", fooBarBigDecimal, bigDecimal, BigDecimal.class)
-//                new JqTestScenario(".foo.bar", fooBarCoolObject, myCoolObject, MyCoolObject.class),
-//                new JqTestScenario(".foo.bar", fooBarCoolObjectList, myCoolObjectList, List.class),
-//                new JqTestScenario(".foo | .bar", fooBar, 1, Integer.class),
-//                new JqTestScenario(".foo | .bar", fooBarBaz, Map.of("baz", 1), Map.class),
-//                new JqTestScenario(".foo | .bar | .baz", fooBarBaz, 1, Integer.class),
-//                new JqTestScenario("{\"foo\": 1}", null, Map.of("foo", new BigDecimal(1)), Map.class)
+                new JqTestScenario(".", fooBar, fooBar, Map.class),
+                new JqTestScenario(".foo.bar", fooBar, 1, Integer.class),
+                new JqTestScenario(".foo.bar", fooBarDouble, 2.5, Double.class),
+               // new JqTestScenario(".", bigDecimal, bigDecimal, BigDecimal.class)
+                 new JqTestScenario(".foo.bar", fooBarBigDecimal, bigDecimal, BigDecimal.class),
+                new JqTestScenario(".foo.bar", fooBarCoolObject, myCoolObject, MyCoolObject.class),
+                new JqTestScenario(".foo.bar", fooBarCoolObjectList, myCoolObjectList, List.class),
+                new JqTestScenario(".foo | .bar", fooBar, 1, Integer.class),
+                new JqTestScenario(".foo | .bar", fooBarBaz, Map.of("baz", 1), Map.class),
+                new JqTestScenario(".foo | .bar | .baz", fooBarBaz, 1, Integer.class),
+                new JqTestScenario("{\"foo\": 1}", null, Map.of("foo", new BigDecimal(1)), Map.class)
         );
     }
 
     @ParameterizedTest
     @MethodSource("jqTestScenarioProvider")
     void scenarioTest(JqTestScenario scenario) {
-        Comparator<? super BigDecimal> myComparator = (Comparator<BigDecimal>) (o1, o2) -> {
-            String str1 = o1.toString();
-            String str2 = o2.toString();
-
-            if (str1.equals(str2)) {
-                return 0;
-            }
-            return 0;
-        };
-
         try {
             Object result = JQ.jq(scenario.getInput(), scenario.getProgram(), scenario.getClazz());
+
+            checkResult(result);
 
             assertThat(result).isNotNull();
             assertThat(result).isInstanceOf(scenario.getClazz());
             assertThat(result).usingRecursiveComparison()
-                    .withComparatorForType(new BigDecimalComparator(), BigDecimal.class)
                     .isEqualTo(scenario.getOutput());
 
+
+
             Object result2 = JQ.jq(scenario.getInput(), scenario.getProgram());
+
+            checkResult(result2);
+
             assertThat(result2).isNotNull();
             assertThat(result2).isInstanceOf(scenario.getClazz());
-
-
             assertThat(result2).usingRecursiveComparison()
-                    .withComparatorForType(new BigDecimalComparator(), BigDecimal.class)
                     .isEqualTo(scenario.getOutput());
         } catch (Exception e) {
             // set breakpoint here to debug exceptions
             assertThat(e).isNull();
+        }
+    }
+
+    // BigDecimal lazily populates precision and the string cache, which would cause the recursive comparison to fail
+    private void checkResult(Object result) {
+        if (result instanceof BigDecimal) {
+            System.out.println(((BigDecimal) result).precision());
+            System.out.println(((BigDecimal) result).toString());
         }
     }
 }
