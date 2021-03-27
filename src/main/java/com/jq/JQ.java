@@ -49,7 +49,9 @@ public class JQ {
     public static <T> T jq(Object input, String expression, Class<T> type) {
         InputStream inputStream = new ByteArrayInputStream(convertToBytes(input));
         try (Context context = Context.newBuilder("jq").in(inputStream).build()) {
-            return context.eval("jq", expression).as(type);
+            Value value = context.eval("jq", expression);
+            T result = value.as(type);
+            return result;
         }
     }
 

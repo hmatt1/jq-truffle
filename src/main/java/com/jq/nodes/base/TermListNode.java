@@ -29,7 +29,7 @@ public class TermListNode extends BaseNode {
             if (myObject instanceof Map) {
                 if (previousType == DOT && currentType == FIELD) {
                     myObject = ((Map) myObject).get(term.executeObject(frame));
-                } else {
+                } else if (currentType != DOT && previousType != DOT){
                     myObject = processTerm(currentType, text);
                 }
             } else if (myObject instanceof List) {
