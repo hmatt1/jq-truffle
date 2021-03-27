@@ -20,7 +20,9 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
     public JqNode visitVPipe(JqParser.VPipeContext ctx) {
         List<ExpdNode> expdNodes = new ArrayList<>();
         for (int i = 0; i < ctx.getChildCount(); i++) {
-            expdNodes.add((ExpdNode) visit(ctx.getChild(i)));
+            if (!ctx.getChild(i).getText().equals("|")) {
+                expdNodes.add((ExpdNode) visit(ctx.getChild(i)));
+            }
         }
 
         return new PipeNode(expdNodes);
