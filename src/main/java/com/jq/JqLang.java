@@ -40,11 +40,11 @@ public class JqLang extends TruffleLanguage<JqContext> {
                 input));
         JqParser jqParser = new JqParser(new CommonTokenStream(jqLexer));
 
-        JqParser.ExpContext expContext = jqParser.exp();
+        JqParser.TopContext topContext = jqParser.top();
 
         // creates Truffle nodes from ANTLR parse result
         JqParseVisitor visitor = new JqParseVisitor();
-        JqNode jqNode = visitor.visitExp(expContext);
+        JqNode jqNode = visitor.visit(topContext);
 
         return new JqRootNode(jqNode);
     }

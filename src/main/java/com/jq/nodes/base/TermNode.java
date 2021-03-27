@@ -1,8 +1,8 @@
-package com.jq.nodes;
+package com.jq.nodes.base;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-public final class TermNode extends JqNode {
+public class TermNode extends BaseNode {
     private final String value;
 
     public TermNode(String value) {
@@ -10,7 +10,7 @@ public final class TermNode extends JqNode {
     }
 
     @Override
-    public Object executeObject(VirtualFrame frame) {
+    public String executeObject(VirtualFrame frame) {
         return value;
     }
 }
