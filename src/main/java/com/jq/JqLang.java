@@ -36,8 +36,6 @@ public class JqLang extends TruffleLanguage<JqContext> {
         // get user input
         String input = source.getCharacters().toString();
 
-        System.out.println("inputted String: " + input);
-
         JqLexer jqLexer = new JqLexer(CharStreams.fromString(
                 input));
         JqParser jqParser = new JqParser(new CommonTokenStream(jqLexer));

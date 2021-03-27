@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestInstance;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -55,6 +56,21 @@ class JqTest {
         assertThat(result).isExactlyInstanceOf(MyCoolObject.class);
         assertThat(((MyCoolObject) result).getStatus()).isEqualTo("biz");
         assertThat(((MyCoolObject) result).getCode()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test .foo.bar with a list of custom Java object")
+    public void myTest5() {
+        Map<String, Object> input = Map.of("foo", Map.of("bar", List.of(
+                new MyCoolObject("baz", 2),
+                new MyCoolObject("biz", 1))));
+        Object result = JQ.jq(input, ".foo.bar");
+
+        assertThat(result).isInstanceOf(List.class);
+        assertThat(((List<MyCoolObject>) result).get(0).getStatus()).isEqualTo("baz");
+        assertThat(((List<MyCoolObject>) result).get(0).getCode()).isEqualTo(2);
+        assertThat(((List<MyCoolObject>) result).get(1).getStatus()).isEqualTo("biz");
+        assertThat(((List<MyCoolObject>) result).get(1).getCode()).isEqualTo(1);
     }
 
     public static class MyCoolObject implements Serializable {
