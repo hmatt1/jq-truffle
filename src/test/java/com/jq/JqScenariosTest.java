@@ -38,21 +38,29 @@ class JqScenariosTest {
                 new JqTestScenario(".foo.bar", fooBarCoolObjectList, myCoolObjectList, List.class),
                 new JqTestScenario(".foo | .bar", fooBar, 1, Integer.class),
                 new JqTestScenario(".foo | .bar", fooBarBaz, Map.of("baz", 1), Map.class),
-                new JqTestScenario(".foo | .bar | .baz", fooBarBaz, 1, Integer.class)
+                new JqTestScenario(".foo | .bar | .baz", fooBarBaz, 1, Integer.class),
+                new JqTestScenario("{\"foo\": 1}", null, Map.of("foo", new BigDecimal(1)), Map.class)
         );
     }
 
     @ParameterizedTest
     @MethodSource("jqTestScenarioProvider")
     void scenarioTest(JqTestScenario scenario) {
-        Object result = JQ.jq(scenario.getInput(), scenario.getProgram(), scenario.getClazz());
+        try {
+            Object result = JQ.jq(scenario.getInput(), scenario.getProgram(), scenario.getClazz());
 
-        assertThat(result).isInstanceOf(scenario.getClazz());
-        assertThat(scenario.getClazz().cast(result)).isEqualTo(scenario.getOutput());
+            assertThat(result).isNotNull();
+            assertThat(result).isInstanceOf(scenario.getClazz());
+            assertThat(result).usingRecursiveComparison().isEqualTo(scenario.getOutput());
 
-        Object result2 = JQ.jq(scenario.getInput(), scenario.getProgram());
-        assertThat(result2).isInstanceOf(scenario.getClazz());
-        assertThat(scenario.getClazz().cast(result2)).isEqualTo(scenario.getOutput());
+            Object result2 = JQ.jq(scenario.getInput(), scenario.getProgram());
+            assertThat(result2).isNotNull();
+            assertThat(result2).isInstanceOf(scenario.getClazz());
+            assertThat(result2).usingRecursiveComparison().isEqualTo(scenario.getOutput());
+        } catch (Exception e) {
+            // set breakpoint here to debug exceptions
+            assertThat(e).isNull();
+        }
     }
 }
 

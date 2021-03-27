@@ -7,7 +7,10 @@ import com.jq.nodes.base.TermListNode;
 import com.jq.nodes.base.TermNode;
 import com.jq.nodes.expd.ExpdNode;
 import com.jq.nodes.expd.VValueNode;
+import com.jq.nodes.json.JsonNode;
+import com.jq.nodes.json.PairNode;
 import com.jq.nodes.top.PipeNode;
+import com.jq.nodes.value.VJsonNode;
 import com.jq.nodes.value.VTermListNode;
 import com.jq.nodes.value.ValNode;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -40,7 +43,9 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
 
     @Override
     public JqNode visitVValue(JqParser.VValueContext ctx) {
-        return new VValueNode((ValNode) visit(ctx.getChild(0)));
+        JqNode child = visit(ctx.getChild(0));
+
+        return new VValueNode((ValNode) child);
     }
 
     @Override
@@ -50,7 +55,7 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
 
     @Override
     public JqNode visitVJson(JqParser.VJsonContext ctx) {
-        return super.visitVJson(ctx);
+        return new VJsonNode((JsonNode) visit(ctx.getChild(0)));
     }
 
     @Override
@@ -80,12 +85,33 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
 
     @Override
     public JqNode visitJson(JqParser.JsonContext ctx) {
-        return super.visitJson(ctx);
+        List<PairNode> pairNodes = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            JqNode jqNode = visit(ctx.getChild(i));
+            if (jqNode instanceof PairNode) {
+                pairNodes.add((PairNode) jqNode);
+            }
+        }
+
+        return new JsonNode(pairNodes);
     }
 
     @Override
     public JqNode visitPair(JqParser.PairContext ctx) {
-        return super.visitPair(ctx);
+
+        TermListNode termListNode = null;
+        ValNode valNode = null;
+
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            JqNode jqNode = visit(ctx.getChild(i));
+            if (jqNode instanceof TermListNode) {
+                termListNode = (TermListNode) jqNode;
+            } else if (jqNode instanceof ValNode) {
+                valNode = (ValNode) jqNode;
+            }
+        }
+
+        return new PairNode(termListNode, valNode);
     }
 
     @Override
@@ -128,7 +154,7 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
     public JqNode visitTerm_list(JqParser.Term_listContext ctx) {
         List<TermNode> terms = new ArrayList<>();
         for (ParseTree child :
-             ctx.children) {
+                ctx.children) {
             JqNode termNode = this.visit(child);
             if (termNode instanceof TermNode) {
                 terms.add((TermNode) termNode);

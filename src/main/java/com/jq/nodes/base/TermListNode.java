@@ -3,6 +3,7 @@ package com.jq.nodes.base;
 import com.oracle.truffle.api.exception.AbstractTruffleException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -28,13 +29,23 @@ public class TermListNode extends BaseNode {
             if (myObject instanceof Map) {
                 if (previousType == DOT && currentType == FIELD) {
                     myObject = ((Map) myObject).get(term.executeObject(frame));
+                } else {
+                    myObject = processTerm(currentType, text);
                 }
-
+            } else if (myObject instanceof List) {
+                throw new AbstractTruffleException() {
+                    @Override
+                    public String getMessage() {
+                        return "TERM LIST NODE: List not yet supported: " + term.executeObject(frame);
+                    }
+                };
+            } else  if (myObject == null) {
+                myObject = processTerm(currentType, text);
             } else {
                 throw new AbstractTruffleException() {
                     @Override
                     public String getMessage() {
-                        return "Failed to reference object in map using key: " + term.executeObject(frame);
+                        return "TERM LIST NODE: Failed to reference object in map using key: " + term.executeObject(frame);
                     }
                 };
             }
@@ -43,6 +54,30 @@ public class TermListNode extends BaseNode {
         }
 
         return myObject;
+    }
+
+    protected Object processTerm(TYPE currentType, String text) {
+        Object myObject;
+        if (currentType == STRING) {
+            myObject = removeQuotes(text);
+        } else if (currentType == NUMBER) {
+            myObject = new BigDecimal(text);
+        } else {
+            throw new AbstractTruffleException() {
+                @Override
+                public String getMessage() {
+                    return "TERM LIST NODE: can't handle it: " + text;
+                }
+            };
+        }
+        return myObject;
+    }
+
+    protected Object removeQuotes(String text) {
+        if (text.matches("^\".*\"$")) {
+            text = text.replaceAll("^\"", "").replaceAll("\"$", "");
+        }
+        return text;
     }
 
     protected static TYPE getType(String text) {
