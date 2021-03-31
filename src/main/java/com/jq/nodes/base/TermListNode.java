@@ -41,13 +41,6 @@ public class TermListNode extends BaseNode {
                 };
             } else  if (myObject == null) {
                 myObject = processTerm(currentType, text);
-            } else {
-                throw new AbstractTruffleException() {
-                    @Override
-                    public String getMessage() {
-                        return "TERM LIST NODE: Failed to reference object in map using key: " + term.executeObject(frame);
-                    }
-                };
             }
 
             previousType = currentType;

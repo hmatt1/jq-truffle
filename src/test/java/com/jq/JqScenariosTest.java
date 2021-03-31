@@ -23,6 +23,7 @@ class JqScenariosTest {
         List<MyCoolObject> myCoolObjectList = List.of(myCoolObject, myCoolObject1);
 
         BigDecimal bigDecimal = new BigDecimal("11289349081723498072314987");
+
         Map<String, Object> fooBar = Map.of("foo", Map.of("bar", 1));
         Map<String, Object> fooBarDouble = Map.of("foo", Map.of("bar", 2.5));
         Map<String, Object> fooBarBigDecimal = Map.of("foo", Map.of("bar", bigDecimal));
@@ -30,13 +31,14 @@ class JqScenariosTest {
         Map<String, Object> fooBarBaz = Map.of("foo", Map.of("bar", Map.of("baz", 1)));
         Map<String, Object> fooBarCoolObjectList = Map.of("foo", Map.of("bar", myCoolObjectList));
 
+        Map<String, Object> fooBarMapList = Map.of("foo", List.of(Map.of("bar", "a"), Map.of("bar", "b")));
 
         return Stream.of(
                 new JqTestScenario(".", fooBar, fooBar, Map.class),
                 new JqTestScenario(".foo.bar", fooBar, 1, Integer.class),
                 new JqTestScenario(".foo.bar", fooBarDouble, 2.5, Double.class),
-               // new JqTestScenario(".", bigDecimal, bigDecimal, BigDecimal.class)
-                 new JqTestScenario(".foo.bar", fooBarBigDecimal, bigDecimal, BigDecimal.class),
+                new JqTestScenario(".", bigDecimal, bigDecimal, BigDecimal.class),
+                new JqTestScenario(".foo.bar", fooBarBigDecimal, bigDecimal, BigDecimal.class),
                 new JqTestScenario(".foo.bar", fooBarCoolObject, myCoolObject, MyCoolObject.class),
                 new JqTestScenario(".foo.bar", fooBarCoolObjectList, myCoolObjectList, List.class),
                 new JqTestScenario(".foo | .bar", fooBar, 1, Integer.class),
@@ -46,7 +48,8 @@ class JqScenariosTest {
                 new JqTestScenario("{\"foo\": {\"bar\": 1 } }", null, Map.of("foo", Map.of("bar", new BigDecimal(1))), Map.class),
                 new JqTestScenario("{\"foo\": {\"bar\": 1 } } | .foo", null, Map.of("bar", new BigDecimal(1)), Map.class),
                 new JqTestScenario("{\"foo\": {\"bar\": 1 } } | { \"biz\": .foo.bar }", null, Map.of("biz", new BigDecimal(1)), Map.class),
-                new JqTestScenario("{ \"biz\": .foo.bar }", fooBar, Map.of("biz", 1), Map.class)
+                new JqTestScenario("{ \"biz\": .foo.bar }", fooBar, Map.of("biz", 1), Map.class),
+                new JqTestScenario("[.]", myCoolObject, List.of(myCoolObject1), List.class)
         );
     }
 

@@ -10,9 +10,7 @@ import com.jq.nodes.expd.VValueNode;
 import com.jq.nodes.json.JsonNode;
 import com.jq.nodes.json.PairNode;
 import com.jq.nodes.top.PipeNode;
-import com.jq.nodes.value.VJsonNode;
-import com.jq.nodes.value.VTermListNode;
-import com.jq.nodes.value.ValNode;
+import com.jq.nodes.value.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
@@ -60,7 +58,7 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
 
     @Override
     public JqNode visitVArr(JqParser.VArrContext ctx) {
-        return super.visitVArr(ctx);
+        return new VArrNode((ArrNode) visit(ctx.getChild(0)));
     }
 
     @Override
@@ -116,7 +114,16 @@ public class JqParseVisitor extends JqBaseVisitor<JqNode> {
 
     @Override
     public JqNode visitArr(JqParser.ArrContext ctx) {
-        return super.visitArr(ctx);
+        List<ValNode> valNodes = new ArrayList<>();
+
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            JqNode jqNode = visit(ctx.getChild(i));
+            if (jqNode instanceof ValNode) {
+                valNodes.add((ValNode) jqNode);
+            }
+        }
+
+        return new ArrNode(valNodes);
     }
 
     @Override
